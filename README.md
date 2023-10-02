@@ -19,5 +19,6 @@ Reading list:
   * [git](https://docs.github.com/en/get-started/quickstart/hello-world)
   * [Latex (for writing)](https://www.overleaf.com/learn/latex/Learn_LaTeX_in_30_minutes)
   * [VScode (conding GUI)](https://code.visualstudio.com/)
-
+  * [Code design](https://web.mit.edu/6.001/6.037/sicp.pdf)
+  * [Harvard course]
 
