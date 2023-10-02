@@ -3,9 +3,11 @@
 This repo is created to hold the content of a research project.
 It is composed of a folder for the report (`R0_journal`) and anothrt for the code (`code`).
 
+**Start using the repo by forking it to your own account.**
+
 Reading list:
 * Research papers:
-  Sent in separate email
+  (Sent in separate email)
 
 * Numerical method in general:
   * [Numerical method course](https://ocw.mit.edu/courses/18-335j-introduction-to-numerical-methods-spring-2019/pages/week-1/)
