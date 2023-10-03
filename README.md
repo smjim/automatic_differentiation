@@ -20,5 +20,8 @@ Reading list:
   * [Latex (for writing)](https://www.overleaf.com/learn/latex/Learn_LaTeX_in_30_minutes)
   * [VScode (conding GUI)](https://code.visualstudio.com/)
   * [Code design](https://web.mit.edu/6.001/6.037/sicp.pdf)
-  * [Harvard course]
+  * Harvard intro to CS course
+    * [Intro to CS](https://www.edx.org/learn/computer-science/harvard-university-cs50-s-introduction-to-computer-science?webview=false&campaign=CS50%27s+Introduction+to+Computer+Science&source=edx&product_category=course&placement_url=https%3A%2F%2Fwww.edx.org%2Fcs50)
+    * [python](https://www.edx.org/learn/python/harvard-university-cs50-s-introduction-to-programming-with-python?webview=false&campaign=CS50%27s+Introduction+to+Programming+with+Python&source=edx&product_category=course&placement_url=https%3A%2F%2Fwww.edx.org%2Fcs50)
+  
 
