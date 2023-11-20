@@ -1,97 +1,214 @@
-\documentclass[smallextended]{./springer/svjour3}
-\usepackage{graphicx} % This lets you include figures
-\graphicspath{ {./figures/} }
-\usepackage[rightcaption]{sidecap}
-% \usepackage{subcaption}
-\usepackage{wrapfig}
-\usepackage{float}
-\usepackage{imakeidx}
-\usepackage{comment}
-\usepackage{commath}
-\usepackage[titletoc]{appendix}
-\usepackage{graphicx}
-\usepackage{resizegather}
-\usepackage[english]{babel}
-% \usepackage{subcaption}
-\usepackage{tabu}
-\usepackage{booktabs}
-\usepackage{xfrac}
-\usepackage{tabularx}
-\usepackage{amssymb}
-\usepackage{amsmath}
-% \usepackage{amsthm}
-\usepackage{commath}
-\usepackage{graphicx,bm}
-\usepackage{verbatim}
-% \usepackage{caption}
-\usepackage{lscape}
-\usepackage{relsize}
-\usepackage{enumitem}
-\usepackage{textcomp}
-\usepackage{breqn}
-\usepackage{makecell}
-\usepackage{longtable,tabularx}
-\usepackage{multirow}
-\usepackage{doi}
-\usepackage{fancyhdr}
-\usepackage{algorithm}
-\usepackage{algpseudocode}
-\usepackage{setspace}
-\usepackage{footnote}
-\PassOptionsToPackage{hyphens}{url}
-\usepackage{hyperref}
-\hypersetup{colorlinks,linkcolor={blue},citecolor={blue},urlcolor={blue}}
-\usepackage[numbers]{natbib}
-\usepackage{mathtools}
-\usepackage[disable]{todonotes}
-\usepackage[framemethod=tikz]{mdframed}
-\usepackage{booktabs,xcolor,siunitx}
-\usepackage{soul}
-% \usepackage{cleveref}
-\usepackage[small, compact]{titlesec}
-\usepackage{xcolor}
-\usepackage{appendix}
-% \usepackage{geometry}
-% \geometry{
-% a4paper,
-% total={170mm,257mm},
-% left=20mm,
-% top=20mm,
-% }
+\documentclass{article}
+\usepackage{graphicx} % Required for inserting images
+\usepackage{amsmath} % Required for PDE writing
 
-% \newtheorem{theorem}{Theorem}[section]
-% \newtheorem{lemma}[theorem]{Lemma}
-\newcommand{\ra}[1]{\renewcommand{\arraystretch}{#1}}
-\newcommand{\degree}{\ensuremath{^\circ\,}}
-\newcommand{\overbar}[1]{\mkern 1.5mu\overline{\mkern-1.5mu#1\mkern-1.5mu}\mkern 1.5mu}
-\newcommand{\f}[2]{\frac{#1}{#2}}
-\newcommand{\mb}[1]{\mathbf{#1}}
-\newcommand{\tr}[1]{\mathrm{Tr}\left({#1}\right)}
-\newcommand{\mbg}[1]{\boldsymbol{\mathbf{#1}}}
-\DeclarePairedDelimiter{\ceil}{\lceil}{\rceil}
-\DeclareMathAlphabet\mathbfcal{OMS}{cmsy}{b}{n}
-\renewcommand{\d}{\mathop{}\!\mathrm{d}} % total derivative
-\newcommand{\p}{\partial}
-
-\title{Research project title}
-\author{Name}
-\institute{Name$^*$ ($^*$corresponding author),
-          \email{name@vols.utk.edu} \\
-        \\
-          \at MABE, University of Tennessee, Knoxville,
-          \at Nathan W. Dougherty Engineering Building, 1512 Middle Dr, Knoxville, TN 37916\\
-}
-
-\date{\today}
-
+\title{Heat Equation with Spectral Methods}
+\author{jroger87}
+\date{November 2023}
 
 \begin{document}
-\maketitle{}
 
-\begin{abstract}
-Description of the project.
-\end{abstract}
+\maketitle
 
-\section{Problem setup}
+\section{Problem Formulation}
+
+\begin{equation}
+    \begin{cases}
+        u_t = k u_{xx} & x \in [0, L] \\
+        u(0, t) = sin(t) & u(L, t) = 1.0 \\
+        u(x, 0) = 0.5 
+    \end{cases}
+\end{equation}
+
+\section{Discretizing the Heat Equation via Finite Differences}
+%Using the following finite differences approximation for partial derivatives of $u(x,t)$, the heat equation can be simplified for computation.
+$$u_t = k u_{xx}$$  
+
+Partial derivatives of u(x,t) can be approximated using the following finite difference formulas:
+\begin{equation}
+    \begin{cases}
+        \frac{\partial}{\partial t} u(x,t) \approx \frac{u_{i}^{n+1} - u_{i}^{n}}{\Delta t} \\
+        \frac{\partial^2}{\partial x^2} u(x,t) \approx \frac{u_{i-1}^{n} - 2u_{i}^{n} + u_{i+1}^{n}}{\Delta x^2}        
+    \end{cases}
+\end{equation}
+
+From which the iterative equation to approximate the next time step is derived:
+
+$$\Rightarrow \frac{\partial}{\partial t} u(x,t) - k \cdot \frac{\partial}{\partial x^2} u(x,t) = 0$$
+$$\Rightarrow \frac{u_i^{n+1} - u_i^{n}}{\Delta t} - k \cdot \frac{u_{i-1}^{n} - 2u_{i}^{n} + u_{i+1}^{n}}{\Delta x^2} = 0$$
+\begin{equation}
+\Rightarrow u_i^{n+1} = \frac{k \cdot \Delta t}{\Delta x^2} \cdot (u_{i-1}^{n} - 2u_{i}^{n} + u_{i+1}^{n})
+\label{eq:finite_difference_heatEq}
+\end{equation}
+
+Equation [\ref{eq:finite_difference_heatEq}] represents how to solve for the subsequent time step $t=n+1$ of the heat equation at point $x=i$ given the value at $x=i, i\pm 1$ for $t=n$.
+
+The residual form for this approximation is:
+\begin{equation}
+R_{i}^{n} = \frac{u_i^{n+1} - u_i^{n}}{\Delta t} - k \cdot \frac{u_{i-1}^{n} - 2u_{i}^{n} + u_{i+1}^{n}}{\Delta x^2}
+\label{finite_differences_residual}
+\end{equation}
+
+\section{Discretizing the Heat Equation via Spectral Method}
+
+\begin{align}
+\textbf{u}(x) &= \begin{bmatrix}
+       \textbf{u}(x,0) \\
+       \textbf{u}(x,\frac{T}{N}) \\
+       \textbf{u}(x,2\frac{T}{N}) \\
+       \vdots \\
+       \textbf{u}(x,(N-1)\frac{T}{N}) \\
+   \end{bmatrix}
+   \end{align}
+
+\begin{equation}
+    \textbf{D}_{i,j}(T,N) = 
+    \begin{cases}
+        \frac{2 \pi}{T} (\frac{1}{2}(-1)^{i-j}\frac{1}{sin(\frac{\pi (i-j)}{N})}) & \text{i $\neq$ j} \\
+        0 & \text{i $=$ j}
+    \end{cases}
+\end{equation}
+
+\begin{equation}
+    \frac{\partial}{\partial t} \textbf{u}(x) \approx \textbf{D}(T,N)\textbf{u}(x)
+\end{equation}
+
+%Using the above assumptions, the heat equation can be discretized using a similar process to equation [\ref{eq:finite_difference_heatEq}]:
+
+%$$\Rightarrow u_{i}^{n+1} \approx u_{i}^{n} + \textbf{D}(n,i)u_{i}^{n}$$
+%$$\Rightarrow u_{i}^{n+1} \approx (\textbf{I} + \textbf{D}(n,i)) u_{i}^{n}$$
+%$$\Rightarrow \textbf{u}^{j+1}(x) \approx \textbf{u}^{j}(x) + \delta t \cdot \textbf{D}(T,N)\textbf{u}^{j}(x)$$   
+%I used an Euler method to combine the time step, but in principle if this is the right way to use the differentiation matrix then other time integration schemes could be used.
+%\begin{equation}
+%\Rightarrow \textbf{u}^{j+1}(x) \approx (\textbf{I} + \frac{T}{N} \cdot \textbf{D}(T,N)) \textbf{u}^{j}(x)
+%\label{spectral_iterative_step}
+%\end{equation}
+%For j in [0, 1, ..., N-1] timesteps.
+
+
+%Using equation [\ref{spectral_iterative_step}], the next time step of 
+\begin{equation}
+    \textbf{D}(T,N) = \begin{bmatrix}
+       0 & \frac{-\pi}{T \cdot sin(-\pi/ N)} & \frac{\pi}{T \cdot sin(-2\pi/ N)} & \hdots & \frac{\pi}{T \cdot sin(-(N-1)\pi/ N)}\\
+       \frac{-\pi}{T \cdot sin(\pi/ N)} & 0 & \frac{-\pi}{T \cdot sin(-\pi/ N)} & \hdots & \frac{-\pi}{T \cdot sin(-(N-2)\pi/ N)}\\\\
+       \frac{\pi}{T \cdot sin(2\pi/ N)} & \frac{-\pi}{T \cdot sin(\pi/ N)} & 0 & \hdots & \frac{\pi}{T \cdot sin(-(N-3)\pi/ N)} \\
+       \vdots & \vdots & \vdots & \ddots & \vdots \\
+       \frac{\pi}{T \cdot sin((N-1)\pi/ N)} & \frac{-\pi}{T \cdot sin((N-2)\pi/ N)} & \frac{\pi}{T \cdot sin((N-3)\pi/ N)} & \hdots & 0\\
+   \end{bmatrix}
+   \label{eq:spectral_differentiation_matrix}
+\end{equation}
+The Spectral Differentiation Matrix (Equation [\ref{eq:spectral_differentiation_matrix}]) is the above for input scalars T, N corresponding to the total time of the simulation and the number of discretized timesteps, respectively.
+
+\subsection{Question:}
+
+Here is my progress for part 1.2:  
+
+given:
+$$\frac{\partial}{\partial t}\textbf{u}(x) \approx \textbf{D}(T,N)\textbf{u}(x)$$
+
+let:
+\begin{align*}
+\frac{\partial}{\partial t}\textbf{u}(x)
+\approx \begin{bmatrix}
+       \textbf{u}(x,\frac{T}{N}) \\
+       \textbf{u}(x,2\frac{T}{N}) \\
+       \textbf{u}(x,3\frac{T}{N}) \\
+       \vdots \\
+       \textbf{u}(x,(N-1)\frac{T}{N}) \\
+   \end{bmatrix}
+   - \begin{bmatrix}
+       \textbf{u}(x,0) \\
+       \textbf{u}(x,\frac{T}{N}) \\
+       \textbf{u}(x,2\frac{T}{N}) \\
+       \vdots \\
+       \textbf{u}(x,(N-2)\frac{T}{N}) \\
+   \end{bmatrix}
+   \end{align*}
+
+\begin{align*}
+\Rightarrow \textbf{D}(T,N)\textbf{u}(x)
+    \approx \begin{bmatrix}
+       \textbf{u}(x,\frac{T}{N}) \\
+       \textbf{u}(x,2\frac{T}{N}) \\
+       \textbf{u}(x,3\frac{T}{N}) \\
+       \vdots \\
+       \textbf{u}(x,(N-1)\frac{T}{N}) \\
+   \end{bmatrix}
+   - \begin{bmatrix}
+       \textbf{u}(x,0) \\
+       \textbf{u}(x,\frac{T}{N}) \\
+       \textbf{u}(x,2\frac{T}{N}) \\
+       \vdots \\
+       \textbf{u}(x,(N-2)\frac{T}{N}) \\
+   \end{bmatrix}
+   \end{align*}
+
+$$\Rightarrow \textbf{D}(T,N)\textbf{u}(x) \approx \textbf{S}\textbf{u}(x) - \textbf{I}\textbf{u}(x)$$  
+Where $\textbf{S}$ denotes the circulant matrix. 
+
+** \textit{This also ignores the fact that it is no longer full rank.} **
+$$\Rightarrow \textbf{D}(T,N)\textbf{u}(x) \approx (\textbf{S}-\textbf{I})\textbf{u}(x)$$  
+$$\Rightarrow (\textbf{D}(T,N) - (\textbf{S}-\textbf{I}))\textbf{u}(x) \approx 0$$  
+
+Therefore, the residual form of this spectral method approximation to the heat equation would be:
+$$\textbf{R} = (\textbf{D}(T,N) - (\textbf{S}-\textbf{I}))\textbf{u}(x)$$
+
+Is this on the right track? I am not sure how to solve this equation while incorporating the initial conditions and boundary conditions. 
+What I tried doing was a minimization of \textbf{R} by modifying \textbf{u}(x) with initial conditions and boundary conditions imposed on the problem as constraints on \textbf{u}(x).
+I also read through literature on the differentiation matrices of spectral methods, but this is all new to me so I am not sure where to go from here. 
+
+
+
+\if False { %previous question
+Do you transpose the \textbf{u}(x) matrix to calculate the t+1 value using the differentiation matrix?
+
+\begin{align*}
+\textbf{u}(x,j+1)^T &= \begin{bmatrix}
+       \textbf{u}(0,j+1) \\
+       \textbf{u}(\frac{L}{N_x},j+1) \\
+       \textbf{u}(\frac{2L}{N_x},j+1) \\
+       \vdots \\
+       \textbf{u}(\frac{(N_x-1)L}{N_x},j+1) \\
+   \end{bmatrix}
+&= \begin{bmatrix}
+       \textbf{u}(0,j) \\
+       \textbf{u}(\frac{L}{N_x},j) \\
+       \textbf{u}(\frac{2L}{N_x},j) \\
+       \vdots \\
+       \textbf{u}(\frac{(N_x-1)L}{N_x},j) \\
+   \end{bmatrix} 
+   &+ \delta t \cdot \textbf{D}(T,N) 
+\begin{bmatrix}
+       \textbf{u}(0,j) \\
+       \textbf{u}(\frac{L}{N_x},j) \\
+       \textbf{u}(\frac{2L}{N_x},j) \\
+       \vdots \\
+       \textbf{u}(\frac{(N_x-1)L}{N_x},j) \\
+   \end{bmatrix}  
+\end{align*}
+
+I don't think I understand how to apply the spectral differentiation matrix to get the approximation for the time derivative.
+In literature I found it seems that the spectral differentiation matrix is not normally applied to approximate the time derivative, and I couldn't find anything similar. 
+If it is a valid question to ask, how does the spectral differentiation matrix get used to 
+
+\begin{bmatrix}
+1 & 0 & \cdots & 0 \\
+0 & 1 & \cdots & 0 \\
+\vdots & \vdots & \ddots & \vdots \\
+0 & 0 & \cdots & 1 \\
+A_{\text{{original}}}
+\end{bmatrix}
+
+\[\tilde{b} = \begin{bmatrix}
+\text{{value0}} \\
+\text{{value\_last}} \\
+0 \\
+\vdots \\
+0 \\
+b_{\text{{original}}}
+\end{bmatrix}\]
+} \fi
+
 
 \end{document}
+
